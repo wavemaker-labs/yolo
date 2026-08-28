@@ -33,5 +33,5 @@ jobs:
       # labels - our Dockerfile does set python_sdk_version - but looks the image up
       # under supervisely/, so it falls back to the release description. Every
       # release description must therefore carry a line:
-      #     python_sdk_version: 6.74.26
+      #     python_sdk_version: 6.73.564
       # Set SKIP_INSTANCE_VERSION_VALIDATION below instead to drop the check.
