@@ -1,20 +1,58 @@
 name: Release Models Manual
+
+# Inlined replacement for supervisely-ecosystem/workflows/.../sync_models_common.yml,
+# which pins `runs-on: gha-runner-supervisely-ecosystem` - a runner registered only to
+# the supervisely-ecosystem org - and activates a pre-baked venv on it. The scripts are
+# public, so they run here on a GitHub-hosted runner with the deps installed instead.
+
 on:
   workflow_dispatch:
     inputs:
       models_path:
         type: string
         required: true
+        default: supervisely_integration/models.json
       framework:
         type: string
         required: true
+        default: YOLO
 
 jobs:
-  release-models:
-    uses: supervisely-ecosystem/workflows/.github/workflows/sync_models_common.yml@master
-    with:
-      MODELS_PATH: ${{ github.event.inputs.models_path }}
-      FRAMEWORK: ${{ github.event.inputs.framework }}
-      SERVER_ADDRESS: ${{ vars.SUPERVISELY_PROD_SERVER_ADDRESS }}
-    secrets:
-      API_TOKEN: ${{ secrets.SUPERVISELY_PROD_API_TOKEN }}
+  Release-Models:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout app
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Checkout release scripts
+        uses: actions/checkout@v4
+        with:
+          repository: supervisely-ecosystem/workflows
+          path: workflow
+
+      # 3.12 or newer is required: release.py uses PEP 701 f-strings (same-type
+      # quotes nested inside the expression), which are a SyntaxError before 3.12.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install release dependencies
+        run: pip install -r workflow/requirements.txt
+
+      - name: Resolve models path and framework
+        run: python workflow/get_inputs.py
+        env:
+          MODELS_PATH: "${{ github.event.inputs.models_path }}"
+          FRAMEWORK: "${{ github.event.inputs.framework }}"
+
+      - name: Sync models
+        # get_inputs.py exported FRAMEWORK and MODELS_PATH through GITHUB_ENV.
+        run: python workflow/release_models.py
+        env:
+          SUPERVISELY_PROD_SERVER_ADDRESS: "${{ vars.SUPERVISELY_PROD_SERVER_ADDRESS }}"
+          SUPERVISELY_PROD_API_TOKEN: "${{ secrets.SUPERVISELY_PROD_API_TOKEN }}"

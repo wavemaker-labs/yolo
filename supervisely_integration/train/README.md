@@ -83,6 +83,28 @@ This app allows you to train models using checkpoints from YOLO architecture on 
 | YOLOv8l-seg | 640       | 52.3      | 42.6       | 46.0       | 220.5     | [Download](https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8l-seg.pt) |
 | YOLOv8x-seg | 640       | 53.4      | 43.4       | 71.8       | 344.1     | [Download](https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8x-seg.pt) |
 
+**Oriented Bounding Box (OBB) models**
+
+Pretrained on [DOTAv1](https://captain-whu.github.io/DOTA/index.html) (15 classes of aerial objects). These predict rotated boxes, which are stored as Supervisely `OrientedBBox` labels.
+
+| Model       | Size (px) | mAP50 (DOTAv1) | Params (M) | FLOPs (B) | Checkpoint                                                                                |
+| ----------- | --------- | -------------- | ---------- | --------- | ----------------------------------------------------------------------------------------- |
+| YOLO26n-obb | 1024      | 78.9           | 2.5        | 14.0      | [Download](https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n-obb.pt) |
+| YOLO26s-obb | 1024      | 80.9           | 9.8        | 55.1      | [Download](https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26s-obb.pt) |
+| YOLO26m-obb | 1024      | 81.0           | 21.2       | 183.3     | [Download](https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m-obb.pt) |
+| YOLO26l-obb | 1024      | 81.6           | 25.6       | 230.0     | [Download](https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26l-obb.pt) |
+| YOLO26x-obb | 1024      | 81.7           | 57.6       | 516.5     | [Download](https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26x-obb.pt) |
+| YOLO11n-obb | 1024      | 78.4           | 2.7        | 16.8      | [Download](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-obb.pt) |
+| YOLO11s-obb | 1024      | 79.5           | 9.7        | 57.1      | [Download](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-obb.pt) |
+| YOLO11m-obb | 1024      | 80.9           | 20.9       | 182.8     | [Download](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11m-obb.pt) |
+| YOLO11l-obb | 1024      | 81.0           | 26.1       | 231.2     | [Download](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l-obb.pt) |
+| YOLO11x-obb | 1024      | 81.3           | 58.8       | 519.1     | [Download](https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x-obb.pt) |
+| YOLOv8n-obb | 1024      | 78.0           | 3.1        | 23.3      | [Download](https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8n-obb.pt) |
+| YOLOv8s-obb | 1024      | 79.5           | 11.4       | 76.3      | [Download](https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8s-obb.pt) |
+| YOLOv8m-obb | 1024      | 80.5           | 26.4       | 208.6     | [Download](https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8m-obb.pt) |
+| YOLOv8l-obb | 1024      | 80.7           | 44.5       | 433.8     | [Download](https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8l-obb.pt) |
+| YOLOv8x-obb | 1024      | 81.36          | 69.5       | 676.7     | [Download](https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8x-obb.pt) |
+
 # How to Run
 
 **Step 0.** Run the app from context menu of the project with annotations or from the Ecosystem
@@ -131,7 +153,7 @@ After you've trained a model in Supervisely, you can download the checkpoint fro
 
 **Quick start:**
 
-1. **Set up environment**. Install [requirements](https://github.com/supervisely-ecosystem/yolo/blob/master/dev_requirements.txt) manually, or use our pre-built docker image from [DockerHub](https://hub.docker.com/r/supervisely/yolo/tags). Clone [YOLO](https://github.com/supervisely-ecosystem/yolo) repository with model implementation.
+1. **Set up environment**. Install [requirements](https://github.com/supervisely-ecosystem/yolo/blob/master/dev_requirements.txt) manually, or use our pre-built docker image from [DockerHub](https://hub.docker.com/r/mpalomata167/yolo/tags). Clone [YOLO](https://github.com/supervisely-ecosystem/yolo) repository with model implementation.
 2. **Download** your checkpoint from Supervisely Platform.
 3. **Run inference**. Refer to our demo scripts: [demo_pytorch.py](https://github.com/supervisely-ecosystem/yolo/blob/master/supervisely_integration/demo/demo_pytorch.py), [demo_onnx.py](https://github.com/supervisely-ecosystem/yolo/blob/master/supervisely_integration/demo/demo_onnx.py), [demo_tensorrt.py](https://github.com/supervisely-ecosystem/yolo/blob/master/supervisely_integration/demo/demo_tensorrt.py)
 
@@ -149,10 +171,10 @@ pip install -r requirements.txt
 
 **Using docker image (advanced):**
 
-We provide a pre-built docker image with all dependencies installed [DockerHub](https://hub.docker.com/r/supervisely/yolo/tags). The image includes installed packages for ONNXRuntime and TensorRT inference.
+We provide a pre-built docker image with all dependencies installed [DockerHub](https://hub.docker.com/r/mpalomata167/yolo/tags). The image includes installed packages for ONNXRuntime and TensorRT inference.
 
 ```bash
-docker pull supervisely/yolo:1.0.31-deploy
+docker pull mpalomata167/yolo:1.0.37-deploy
 ```
 
 See our [Dockerfile](https://github.com/supervisely-ecosystem/yolo/blob/master/docker/Dockerfile) for more details.

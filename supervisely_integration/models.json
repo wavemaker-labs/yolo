@@ -135,6 +135,71 @@
         }
     },
     {
+        "model_name": "YOLO26n-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "78.9",
+        "params (M)": "2.5",
+        "FLOPs (B)": "14.0",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLO26s-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "80.9",
+        "params (M)": "9.8",
+        "FLOPs (B)": "55.1",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26s-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLO26m-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "81.0",
+        "params (M)": "21.2",
+        "FLOPs (B)": "183.3",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26m-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLO26l-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "81.6",
+        "params (M)": "25.6",
+        "FLOPs (B)": "230.0",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26l-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLO26x-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "81.7",
+        "params (M)": "57.6",
+        "FLOPs (B)": "516.5",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26x-obb.pt"
+            }
+        }
+    },
+    {
         "model_name": "YOLO12n",
         "Size (pixels)": "640",
         "mAP": "40.6",
@@ -331,6 +396,71 @@
             "task_type": "instance segmentation",
             "model_files": {
                 "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x-seg.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLO11n-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "78.4",
+        "params (M)": "2.7",
+        "FLOPs (B)": "16.8",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLO11s-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "79.5",
+        "params (M)": "9.7",
+        "FLOPs (B)": "57.1",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLO11m-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "80.9",
+        "params (M)": "20.9",
+        "FLOPs (B)": "182.8",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11m-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLO11l-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "81.0",
+        "params (M)": "26.1",
+        "FLOPs (B)": "231.2",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLO11x-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "81.3",
+        "params (M)": "58.8",
+        "FLOPs (B)": "519.1",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x-obb.pt"
             }
         }
     },
@@ -650,6 +780,71 @@
             "task_type": "instance segmentation",
             "model_files": {
                 "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8x-seg.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLOv8n-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "78.0",
+        "params (M)": "3.1",
+        "FLOPs (B)": "23.3",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8n-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLOv8s-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "79.5",
+        "params (M)": "11.4",
+        "FLOPs (B)": "76.3",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8s-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLOv8m-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "80.5",
+        "params (M)": "26.4",
+        "FLOPs (B)": "208.6",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8m-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLOv8l-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "80.7",
+        "params (M)": "44.5",
+        "FLOPs (B)": "433.8",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8l-obb.pt"
+            }
+        }
+    },
+    {
+        "model_name": "YOLOv8x-obb",
+        "Size (pixels)": "1024",
+        "mAP50 (DOTAv1)": "81.36",
+        "params (M)": "69.5",
+        "FLOPs (B)": "676.7",
+        "meta": {
+            "task_type": "oriented object detection",
+            "model_files": {
+                "checkpoint": "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8x-obb.pt"
             }
         }
     },

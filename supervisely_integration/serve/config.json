@@ -1,40 +1,40 @@
 {
-    "type": "app",
-    "version": "2.0.0",
-    "name": "Serve YOLO v8 - 26",
-    "description": "Deploy YOLO models as a REST API service",
-    "poster": "https://github.com/user-attachments/assets/d78b6955-8b33-435d-a2de-a2d6c5cffa72",
-    "icon": "https://github.com/supervisely-ecosystem/yolo/releases/download/v1.0.3/icon_yolo_api_serve.jpg",
-    "icon_cover": true,
-    "categories": [
-        "neural network",
-        "images",
-        "object detection",
-        "instance segmentation",
-        "detection & tracking",
-        "segmentation & tracking",
-        "serve",
-        "framework:YOLO"
-    ],
-    "task_location": "application_sessions",
-    "docker_image": "supervisely/yolo:1.0.37",
-    "cuda_version": 12.8,
-    "community_agent": false,
-    "need_gpu": false,
-    "gpu": "preferred",
-    "session_tags": [
-        "deployed_nn",
-        "sly_video_tracking_by_detection"
-    ],
-    "license": {
-        "type": "AGPL-3.0"
-    },
-    "instance_version": "6.17.8",
-    "entrypoint": "python3 -m uvicorn main:model.app --host 0.0.0.0 --port 8000 --ws websockets --app-dir supervisely_integration/serve",
-    "port": 8000,
-    "files": {
-        "models": "supervisely_integration/models.json",
-        "inference_settings": "supervisely_integration/serve/inference_settings.yaml",
-        "hyperparams": "supervisely_integration/train/hyperparameters.yaml"
-    }
+  "type": "app",
+  "version": "2.0.0",
+  "name": "Vebu Serve YOLO v8 - 26",
+  "description": "Deploy YOLO models as a REST API service",
+  "poster": "https://github.com/user-attachments/assets/d78b6955-8b33-435d-a2de-a2d6c5cffa72",
+  "icon": "https://github.com/supervisely-ecosystem/yolo/releases/download/v1.0.3/icon_yolo_api_serve.jpg",
+  "icon_cover": true,
+  "categories": [
+    "neural network",
+    "images",
+    "object detection",
+    "instance segmentation",
+    "detection & tracking",
+    "segmentation & tracking",
+    "serve",
+    "framework:YOLO"
+  ],
+  "task_location": "application_sessions",
+  "docker_image": "mpalomata167/yolo:1.0.37",
+  "cuda_version": 12.8,
+  "community_agent": false,
+  "need_gpu": false,
+  "gpu": "preferred",
+  "session_tags": [
+    "deployed_nn",
+    "sly_video_tracking_by_detection"
+  ],
+  "license": {
+    "type": "AGPL-3.0"
+  },
+  "instance_version": "6.17.8",
+  "entrypoint": "python3 -m uvicorn main:model.app --host 0.0.0.0 --port 8000 --ws websockets --app-dir supervisely_integration/serve",
+  "port": 8000,
+  "files": {
+    "models": "supervisely_integration/models.json",
+    "inference_settings": "supervisely_integration/serve/inference_settings.yaml",
+    "hyperparams": "supervisely_integration/train/hyperparameters.yaml"
+  }
 }
