@@ -153,7 +153,7 @@ After you've trained a model in Supervisely, you can download the checkpoint fro
 
 **Quick start:**
 
-1. **Set up environment**. Install [requirements](https://github.com/supervisely-ecosystem/yolo/blob/master/dev_requirements.txt) manually, or use our pre-built docker image from [DockerHub](https://hub.docker.com/r/supervisely/yolo/tags). Clone [YOLO](https://github.com/supervisely-ecosystem/yolo) repository with model implementation.
+1. **Set up environment**. Install [requirements](https://github.com/supervisely-ecosystem/yolo/blob/master/dev_requirements.txt) manually, or use our pre-built docker image from [DockerHub](https://hub.docker.com/r/mpalomata167/yolo/tags). Clone [YOLO](https://github.com/supervisely-ecosystem/yolo) repository with model implementation.
 2. **Download** your checkpoint from Supervisely Platform.
 3. **Run inference**. Refer to our demo scripts: [demo_pytorch.py](https://github.com/supervisely-ecosystem/yolo/blob/master/supervisely_integration/demo/demo_pytorch.py), [demo_onnx.py](https://github.com/supervisely-ecosystem/yolo/blob/master/supervisely_integration/demo/demo_onnx.py), [demo_tensorrt.py](https://github.com/supervisely-ecosystem/yolo/blob/master/supervisely_integration/demo/demo_tensorrt.py)
 
@@ -171,10 +171,10 @@ pip install -r requirements.txt
 
 **Using docker image (advanced):**
 
-We provide a pre-built docker image with all dependencies installed [DockerHub](https://hub.docker.com/r/supervisely/yolo/tags). The image includes installed packages for ONNXRuntime and TensorRT inference.
+We provide a pre-built docker image with all dependencies installed [DockerHub](https://hub.docker.com/r/mpalomata167/yolo/tags). The image includes installed packages for ONNXRuntime and TensorRT inference.
 
 ```bash
-docker pull supervisely/yolo:1.0.31-deploy
+docker pull mpalomata167/yolo:1.0.37-deploy
 ```
 
 See our [Dockerfile](https://github.com/supervisely-ecosystem/yolo/blob/master/docker/Dockerfile) for more details.

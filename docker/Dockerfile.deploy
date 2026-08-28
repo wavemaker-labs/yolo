@@ -1,4 +1,4 @@
-FROM supervisely/yolo:1.0.31
+FROM mpalomata167/yolo:1.0.37
 
 WORKDIR /app
 COPY . /app
