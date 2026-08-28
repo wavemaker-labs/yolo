@@ -26,9 +26,11 @@ jobs:
           ref: runner-updates
           path: workflow
 
+      # 3.12 or newer is required: release.py uses PEP 701 f-strings (same-type
+      # quotes nested inside the expression), which are a SyntaxError before 3.12.
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install release dependencies
         run: pip install -r workflow/requirements.txt
