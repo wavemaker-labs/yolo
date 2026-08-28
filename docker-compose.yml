@@ -1,6 +1,6 @@
 services:
   yolo:
-    image: mpalomata167/yolo:1.0.37-deploy
+    image: mpalomata167/yolo:1.0.38-deploy
     shm_size: 1g
     runtime: nvidia
     env_file:
