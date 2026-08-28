@@ -25,3 +25,13 @@ jobs:
       # literal "RELEASE_MODELS". This app's releases carry models.json, so ask for
       # the sync outright rather than relying on a magic string in the title.
       RELEASE_MODELS: true
+      # See release_branch.yml: the image check hardcodes the supervisely namespace
+      # and needs skopeo, so it cannot run against mpalomata167/yolo here.
+      SKIP_IMAGE_VALIDATION: true
+      # NOTE: unlike the other two release types, "release" also validates
+      # instance_version against the SDK version. It reads that from the image
+      # labels - our Dockerfile does set python_sdk_version - but looks the image up
+      # under supervisely/, so it falls back to the release description. Every
+      # release description must therefore carry a line:
+      #     python_sdk_version: 6.74.26
+      # Set SKIP_INSTANCE_VERSION_VALIDATION below instead to drop the check.
