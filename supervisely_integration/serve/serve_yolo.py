@@ -7,9 +7,10 @@ import numpy as np
 from ultralytics import YOLO
 
 import supervisely as sly
-from supervisely.convert.image.yolo.yolo_helper import SLY_YOLO_TASK_TYPE_MAP
 from supervisely.nn.inference import ModelPrecision, ModelSource, RuntimeType, TaskType
 from supervisely.nn.prediction_dto import PredictionBBox, PredictionMask
+
+from supervisely_integration.obb import OBB_TASK_TYPE, prediction_from_xywhr, to_yolo_task
 
 SERVE_PATH = "supervisely_integration/serve"
 
@@ -39,13 +40,12 @@ class YOLOModel(sly.nn.inference.ObjectDetection):
             self.model = self._load_tensorrt(checkpoint_path, device)
             self.max_batch_size = 1
 
-        if self.model.task == "detect" and self.task_type == TaskType.INSTANCE_SEGMENTATION:
+        expected_task = to_yolo_task(self.task_type)
+        if self.model.task != expected_task:
             raise ValueError(
-                f"YOLO model is not supported for instance segmentation task. Model task type is {TaskType.OBJECT_DETECTION}, but selected task type is {TaskType.INSTANCE_SEGMENTATION}"
-            )
-        elif self.model.task == "segment" and self.task_type == TaskType.OBJECT_DETECTION:
-            raise ValueError(
-                f"YOLO model is not supported for object detection task. Model task type is {TaskType.INSTANCE_SEGMENTATION}, but selected task type is {TaskType.OBJECT_DETECTION}"
+                f"YOLO model is not supported for {self.task_type} task. "
+                f"Model task type is '{self.model.task}', but selected task type needs "
+                f"a '{expected_task}' model."
             )
 
         self.classes = list(self.model.names.values())
@@ -56,7 +56,9 @@ class YOLOModel(sly.nn.inference.ObjectDetection):
         info["task type"] = self.task_type
         info["videos_support"] = True
         info["async_video_inference_support"] = True
-        info["tracking_on_videos_support"] = True
+        # Tracking by detection pairs boxes between frames as axis-aligned
+        # rectangles, so it is not offered for oriented output.
+        info["tracking_on_videos_support"] = self.task_type != OBB_TASK_TYPE
         return info
 
     # Loaders --------------- #
@@ -67,12 +69,12 @@ class YOLOModel(sly.nn.inference.ObjectDetection):
 
     def _load_onnx(self, checkpoint_path: str, device: str):
         self._check_onnx_device(device)
-        model = YOLO(checkpoint_path, task=SLY_YOLO_TASK_TYPE_MAP[self.task_type])
+        model = YOLO(checkpoint_path, task=to_yolo_task(self.task_type))
         return model
 
     def _load_tensorrt(self, checkpoint_path: str, device: str):
         self._check_tensorrt_device(device)
-        model = YOLO(checkpoint_path, task=SLY_YOLO_TASK_TYPE_MAP[self.task_type])
+        model = YOLO(checkpoint_path, task=to_yolo_task(self.task_type))
         return model
 
     # -------------------------- #
@@ -126,7 +128,18 @@ class YOLOModel(sly.nn.inference.ObjectDetection):
         return predictions, benchmark
 
     def _create_label(self, dto: Union[PredictionMask, PredictionBBox]):
-        if self.task_type == TaskType.OBJECT_DETECTION or dto.class_name.endswith("_bbox"):
+        if self.task_type == OBB_TASK_TYPE:
+            obj_class = self.model_meta.get_obj_class(dto.class_name)
+            if obj_class is None:
+                raise KeyError(
+                    f"Class {dto.class_name} not found in model classes {self.get_classes()}"
+                )
+            geometry = sly.OrientedBBox(*dto.bbox_tlbr, angle=dto.angle)
+            tags = []
+            if dto.score is not None:
+                tags.append(sly.Tag(self._get_confidence_tag_meta(), dto.score))
+            label = sly.Label(geometry, obj_class, tags)
+        elif self.task_type == TaskType.OBJECT_DETECTION or dto.class_name.endswith("_bbox"):
             obj_class = self.model_meta.get_obj_class(dto.class_name)
             if obj_class is None:
                 raise KeyError(
@@ -159,7 +172,18 @@ class YOLOModel(sly.nn.inference.ObjectDetection):
     def _to_dto(self, prediction, settings: dict) -> List[Union[PredictionMask, PredictionBBox]]:
         """Converts YOLO Results to a List of Prediction DTOs."""
         dtos = []
-        if self.task_type == TaskType.OBJECT_DETECTION:
+        if self.task_type == OBB_TASK_TYPE:
+            obb = prediction.obb
+            if obb is not None:
+                # Read through the named properties rather than obb.data columns:
+                # the raw tensor grows a track id column when tracking is on.
+                boxes = obb.xywhr.cpu().numpy()
+                confidences = obb.conf.cpu().numpy()
+                cls_indexes = obb.cls.cpu().numpy()
+                for xywhr, confidence, cls_index in zip(boxes, confidences, cls_indexes):
+                    class_name = self.classes[int(cls_index)]
+                    dtos.append(prediction_from_xywhr(class_name, xywhr, float(confidence)))
+        elif self.task_type == TaskType.OBJECT_DETECTION:
             boxes_data = prediction.boxes.data
             for box in boxes_data:
                 left, top, right, bottom, confidence, cls_index = (
@@ -204,13 +228,19 @@ class YOLOModel(sly.nn.inference.ObjectDetection):
     # -------------------------- #
 
     # Utils -------------------- #
+    def _get_obj_class_shape(self):
+        if self.task_type == OBB_TASK_TYPE:
+            return sly.OrientedBBox
+        elif self.task_type == TaskType.INSTANCE_SEGMENTATION:
+            return sly.Bitmap
+        return sly.Rectangle
+
     def _load_model_meta(self):
         self.class_names = list(self.model.names.values())
-        if self.task_type == TaskType.OBJECT_DETECTION:
-            obj_classes = [sly.ObjClass(name, sly.Rectangle) for name in self.class_names]
-        elif self.task_type == TaskType.INSTANCE_SEGMENTATION:
+        if self.task_type == TaskType.INSTANCE_SEGMENTATION:
             self.general_class_names = list(self.model.names.values())
-            obj_classes = [sly.ObjClass(name, sly.Bitmap) for name in self.class_names]
+        geometry_type = self._get_obj_class_shape()
+        obj_classes = [sly.ObjClass(name, geometry_type) for name in self.class_names]
         self._model_meta = sly.ProjectMeta(obj_classes=sly.ObjClassCollection(obj_classes))
         self._get_confidence_tag_meta()
 

@@ -8,11 +8,12 @@ from ultralytics import settings
 settings.update({"tensorboard": True})
 
 import supervisely as sly
-from supervisely.convert.image.yolo.yolo_helper import SLY_YOLO_TASK_TYPE_MAP
 from supervisely.io.fs import get_file_name, get_file_name_with_ext
 from supervisely.nn import ModelSource
 from supervisely.nn.training.train_app import TrainApp
+from supervisely_integration.obb import OBB_TASK_TYPE, to_yolo_task
 from supervisely_integration.serve.serve_yolo import YOLOModel
+from supervisely_integration.train.obb_dataset import project_to_yolo_obb
 from supervisely_integration.train.trainer import Trainer
 from dotenv import load_dotenv
 
@@ -22,13 +23,43 @@ if sly.is_development():
     load_dotenv(expanduser("~/supervisely.env"))
 
 
+class YOLOTrainApp(TrainApp):
+    """TrainApp plus the bit of task awareness the SDK cannot infer for OBB."""
+
+    def create_model_meta(self, task_type: str):
+        model_meta = super().create_model_meta(task_type)
+        if task_type != OBB_TASK_TYPE:
+            return model_meta
+        # The SDK leaves the source shapes alone for a task type it does not
+        # know. Whatever they were - rectangles, or polygons we fitted rotated
+        # boxes to - the trained model emits oriented boxes.
+        obj_classes = [
+            obj_class.clone(geometry_type=sly.OrientedBBox)
+            for obj_class in model_meta.obj_classes
+        ]
+        return model_meta.clone(obj_classes=obj_classes)
+
+
 base_path = "supervisely_integration/train"
-train = TrainApp(
+train = YOLOTrainApp(
     "YOLO",
     f"supervisely_integration/models.json",
     f"{base_path}/hyperparameters.yaml",
     f"{base_path}/app_options.yaml",
 )
+
+# The SDK builds the class table's allowed shapes from the task type strings in
+# models.json: anything ending in "detection" maps to Rectangle alone (see
+# supervisely/nn/training/gui/classes_selector.py), so OrientedBBox classes -
+# the natural source shape for OBB training - would be filtered out of the
+# table and could not be selected. Let them through.
+if train.gui.classes_selector is not None:
+    classes_table = train.gui.classes_selector.classes_table
+    # An empty list already means "every shape", so only extend a non-empty one.
+    if classes_table.allowed_types and sly.OrientedBBox not in classes_table.allowed_types:
+        classes_table._allowed_types.append(sly.OrientedBBox)
+        classes_table.read_project_from_id(train.gui.project_id)
+        classes_table.select_all()
 
 inference_settings = "supervisely_integration/serve/inference_settings.yaml"
 train.register_inference_class(YOLOModel, inference_settings)
@@ -75,7 +106,11 @@ def convert_data():
     """Convert Supervisely project data to YOLO format."""
     project = train.sly_project
     yolo_project_path = join(getcwd(), train.work_dir, "yolo_project")
-    project.to_yolo(yolo_project_path, train.task_type, val_datasets=["val"])
+    if train.task_type == OBB_TASK_TYPE:
+        # Project.to_yolo only covers detect/segment/pose.
+        project_to_yolo_obb(project, yolo_project_path, val_datasets=["val"])
+    else:
+        project.to_yolo(yolo_project_path, train.task_type, val_datasets=["val"])
     data_config_path = join(yolo_project_path, "data_config.yaml")
 
     # Update YOLO settings
@@ -101,7 +136,7 @@ def prepare_train_config(data_config_path):
     train_config = {**train.hyperparameters}
     train_config.update(
         {
-            "task": SLY_YOLO_TASK_TYPE_MAP[train.task_type],
+            "task": to_yolo_task(train.task_type),
             "mode": "train",
             "model": checkpoint_path,
             "data": data_config_path,
