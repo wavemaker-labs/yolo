@@ -1,57 +1,57 @@
 {
-    "type": "app",
-    "version": "2.0.0",
-    "name": "Train YOLO v8 - 26",
-    "description": "Train YOLO models on your data",
-    "poster": "https://github.com/user-attachments/assets/9999d236-387b-4a6c-b6a0-0ff77ccba315",
-    "icon": "https://github.com/supervisely-ecosystem/yolo/releases/download/v1.0.3/icon_yolo_train.jpg",
-    "icon_cover": true,
-    "categories": [
-        "neural network",
-        "images",
-        "object detection",
-        "instance segmentation",
-        "detection & tracking",
-        "segmentation & tracking",
-        "train",
-        "framework:YOLO"
+  "type": "app",
+  "version": "2.0.0",
+  "name": "Vebu Train YOLO v8 - 26",
+  "description": "Train YOLO models on your data",
+  "poster": "https://github.com/user-attachments/assets/9999d236-387b-4a6c-b6a0-0ff77ccba315",
+  "icon": "https://github.com/supervisely-ecosystem/yolo/releases/download/v1.0.3/icon_yolo_train.jpg",
+  "icon_cover": true,
+  "categories": [
+    "neural network",
+    "images",
+    "object detection",
+    "instance segmentation",
+    "detection & tracking",
+    "segmentation & tracking",
+    "train",
+    "framework:YOLO"
+  ],
+  "task_location": "workspace_tasks",
+  "docker_image": "mpalomata167/yolo:1.0.37",
+  "cuda_version": 12.8,
+  "community_agent": false,
+  "need_gpu": true,
+  "gpu": "required",
+  "context_menu": {
+    "target": [
+      "images_project"
     ],
-    "task_location": "workspace_tasks",
-    "docker_image": "mpalomata167/yolo:1.0.37",
-    "cuda_version": 12.8,
-    "community_agent": false,
-    "need_gpu": true,
-    "gpu": "required",
-    "context_menu": {
-        "target": [
-            "images_project"
-        ],
-        "context_root": "Neural Networks",
-        "context_category": "YOLO"
-    },
-    "license": {
-        "type": "AGPL-3.0"
-    },
-    "instance_version": "6.17.8",
-    "entrypoint": "python3 -m uvicorn main:train.app --host 0.0.0.0 --port 8000 --ws websockets --app-dir supervisely_integration/train",
-    "port": 8000,
-    "framework": {
-        "name": "YOLO",
-        "tags": [
-            "Real-Time"
-        ],
-        "export": [
-            "ONNX",
-            "TensorRT"
-        ],
-        "conference": null,
-        "released": "2025",
-        "description": "Collection of constantly evolving YOLO models maintained by Ultralytics. Well-known for their real-time performance in detection tasks.",
-        "github": "https://github.com/ultralytics/ultralytics"
-    },
-    "files": {
-        "models": "supervisely_integration/models.json",
-        "inference_settings": "supervisely_integration/serve/inference_settings.yaml",
-        "hyperparams": "supervisely_integration/train/hyperparameters.yaml"
-    }
+    "context_root": "Neural Networks",
+    "context_category": "YOLO"
+  },
+  "license": {
+    "type": "AGPL-3.0"
+  },
+  "instance_version": "6.17.8",
+  "entrypoint": "python3 -m uvicorn main:train.app --host 0.0.0.0 --port 8000 --ws websockets --app-dir supervisely_integration/train",
+  "port": 8000,
+  "framework": {
+    "name": "YOLO",
+    "tags": [
+      "Real-Time"
+    ],
+    "export": [
+      "ONNX",
+      "TensorRT"
+    ],
+    "conference": null,
+    "released": "2025",
+    "description": "Collection of constantly evolving YOLO models maintained by Ultralytics. Well-known for their real-time performance in detection tasks.",
+    "github": "https://github.com/ultralytics/ultralytics"
+  },
+  "files": {
+    "models": "supervisely_integration/models.json",
+    "inference_settings": "supervisely_integration/serve/inference_settings.yaml",
+    "hyperparams": "supervisely_integration/train/hyperparameters.yaml"
+  }
 }

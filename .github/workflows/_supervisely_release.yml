@@ -1,0 +1,162 @@
+name: Supervisely Release
+run-name: Supervisely ${{ inputs.SLUG }} ${{ inputs.RELEASE_TYPE }}
+
+# Local replacement for supervisely-ecosystem/workflows/.github/workflows/common.yml.
+#
+# That reusable workflow pins `runs-on: gha-runner-supervisely-ecosystem`, a runner
+# registered only to the supervisely-ecosystem org, so any job calling it from this
+# fork queues until GitHub times it out. The release logic itself is public - it is
+# release.py in that same repo, driven entirely by environment variables - so this
+# runs the identical scripts on a GitHub-hosted runner.
+#
+# Two things common.yml takes from its own runner and we supply explicitly here:
+#   * the Python environment (it activates a pre-baked $HOME/.release_venv)
+#   * the instance credentials, which release.py reads straight from the environment
+
+on:
+  workflow_call:
+    inputs:
+      SLUG:
+        description: "owner/repo of the app being released."
+        required: true
+        type: string
+      RELEASE_TYPE:
+        description: 'One of "release", "release-branch", "publish".'
+        required: true
+        type: string
+      RELEASE_VERSION:
+        required: true
+        type: string
+      RELEASE_DESCRIPTION:
+        required: true
+        type: string
+      SUBAPP_PATHS:
+        description: "Comma separated path to each subapp to release."
+        required: true
+        type: string
+      RELEASE_SUBAPP_FILTER:
+        required: false
+        type: string
+        default: ""
+      COMMIT_SHA:
+        description: "Commit to release. Empty means the triggering ref."
+        required: false
+        type: string
+        default: ""
+      MODELS_PATH:
+        required: false
+        type: string
+        default: ""
+      FRAMEWORK:
+        required: false
+        type: string
+        default: ""
+      RELEASE_MODELS:
+        description: "Force the model catalog sync, as does RELEASE_MODELS in the release description."
+        required: false
+        type: boolean
+        default: false
+      SKIP_INSTANCE_VERSION_VALIDATION:
+        required: false
+        type: boolean
+        default: false
+      SKIP_IMAGE_VALIDATION:
+        required: false
+        type: boolean
+        default: false
+      ARCHIVE_ONLY_CONFIG:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  Supervisely-Release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      release_models: ${{ steps.release.outputs.release_models }}
+    steps:
+      - name: Checkout app
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.COMMIT_SHA }}
+          fetch-depth: 0
+
+      - name: Checkout release scripts
+        uses: actions/checkout@v4
+        with:
+          repository: supervisely-ecosystem/workflows
+          path: workflow
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install release dependencies
+        run: pip install -r workflow/requirements.txt
+
+      - name: Supervisely Release
+        id: release
+        run: python ./workflow/release.py
+        env:
+          SLUG: "${{ inputs.SLUG }}"
+          RELEASE_VERSION: "${{ inputs.RELEASE_VERSION }}"
+          RELEASE_DESCRIPTION: "${{ inputs.RELEASE_DESCRIPTION }}"
+          RELEASE_TYPE: "${{ inputs.RELEASE_TYPE }}"
+          SUBAPP_PATHS: "${{ inputs.SUBAPP_PATHS }}"
+          RELEASE_SUBAPP_FILTER: "${{ inputs.RELEASE_SUBAPP_FILTER }}"
+          SKIP_INSTANCE_VERSION_VALIDATION: "${{ inputs.SKIP_INSTANCE_VERSION_VALIDATION }}"
+          SKIP_IMAGE_VALIDATION: "${{ inputs.SKIP_IMAGE_VALIDATION }}"
+          ARCHIVE_ONLY_CONFIG: "${{ inputs.ARCHIVE_ONLY_CONFIG }}"
+          # common.yml leaves these to its runner's own environment. On a hosted
+          # runner they have to be passed in; release.py picks the pair matching
+          # RELEASE_TYPE.
+          SUPERVISELY_DEV_SERVER_ADDRESS: "${{ vars.SUPERVISELY_DEV_SERVER_ADDRESS }}"
+          SUPERVISELY_PROD_SERVER_ADDRESS: "${{ vars.SUPERVISELY_PROD_SERVER_ADDRESS }}"
+          SUPERVISELY_DEV_API_TOKEN: "${{ secrets.SUPERVISELY_DEV_API_TOKEN }}"
+          SUPERVISELY_PRIVATE_DEV_API_TOKEN: "${{ secrets.SUPERVISELY_PRIVATE_DEV_API_TOKEN }}"
+          SUPERVISELY_PROD_API_TOKEN: "${{ secrets.SUPERVISELY_PROD_API_TOKEN }}"
+          SUPERVISELY_GITHUB_ACCESS_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+  Models-Release:
+    needs: Supervisely-Release
+    # Same gate as common.yml: the catalog is synced only when asked for, either by
+    # the RELEASE_MODELS input or by "RELEASE_MODELS" appearing in the release
+    # description, and never from a branch release.
+    if: (inputs.RELEASE_MODELS || needs.Supervisely-Release.outputs.release_models == 'true') && inputs.RELEASE_TYPE != 'release-branch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout app
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.COMMIT_SHA }}
+          fetch-depth: 0
+
+      - name: Checkout release scripts
+        uses: actions/checkout@v4
+        with:
+          repository: supervisely-ecosystem/workflows
+          path: workflow
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install release dependencies
+        run: pip install -r workflow/requirements.txt
+
+      - name: Resolve models path and framework
+        run: python workflow/get_inputs.py
+        env:
+          MODELS_PATH: "${{ inputs.MODELS_PATH }}"
+          FRAMEWORK: "${{ inputs.FRAMEWORK }}"
+
+      - name: Sync models
+        # get_inputs.py exported FRAMEWORK and MODELS_PATH through GITHUB_ENV.
+        run: python workflow/release_models.py
+        env:
+          SUPERVISELY_PROD_SERVER_ADDRESS: "${{ vars.SUPERVISELY_PROD_SERVER_ADDRESS }}"
+          SUPERVISELY_PROD_API_TOKEN: "${{ secrets.SUPERVISELY_PROD_API_TOKEN }}"
